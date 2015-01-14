@@ -46,7 +46,7 @@ namespace EasyUninstall.Tests.ViewModels
 
 
             var mock = new Mock<IUninstallHelper>();
-            mock.Setup(i => i.Uninstall(app)).Verifiable();
+            mock.Setup(i => i.Uninstall(app, true)).Verifiable();
 
             var viewModel = new MainWindowViewModel(null, mock.Object);
 
@@ -59,7 +59,7 @@ namespace EasyUninstall.Tests.ViewModels
 
             viewModel.RemoveApplications();
 
-            mock.Verify(i => i.Uninstall(app), Times.Never);
+            mock.Verify(i => i.Uninstall(app, true), Times.Never);
         }
 
 
