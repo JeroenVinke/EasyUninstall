@@ -1,0 +1,110 @@
+﻿<Window x:Class="EasyUninstall.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:viewModels="clr-namespace:EasyUninstall.ViewModels"
+        Title="EasyUninstall" Height="500" Width="525" WindowState="Maximized" Icon="/icon.png">
+
+    <Window.DataContext>
+        <viewModels:MainWindowViewModel></viewModels:MainWindowViewModel>
+    </Window.DataContext>
+    
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
+
+        <Style TargetType="ItemsControl">
+            <Setter Property="ItemsPanel">
+                <Setter.Value>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="30"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+
+                <TextBox VerticalContentAlignment="Center" Name="SearchTextBox" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                
+                <Expander Grid.Column="1" IsExpanded="{Binding PublisherFilterVisible}"/>
+            </Grid>
+
+            <WrapPanel Grid.Row="1" Name="PublisherFilterPanel" Visibility="{Binding PublisherFilterVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <CheckBox Checked="ToggleButton_OnChecked" Unchecked="ToggleButton_OnChecked"></CheckBox>
+                <ItemsControl ItemsSource="{Binding PublishersViewSource.View}" >
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding Checked, Mode=TwoWay}" Content="{Binding Name}" ToolTip="{Binding Name}" Width="100"></CheckBox>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </WrapPanel>
+        </Grid>
+        
+        <GridSplitter Grid.Row="1" Height="6" ResizeDirection="Rows" HorizontalAlignment="Stretch" Background="LightGray" IsEnabled="{Binding PublisherFilterVisible}"></GridSplitter>
+
+
+        <TabControl Grid.Row="2" SelectedIndex="{Binding SelectedTabPage, Mode=TwoWay}">
+            <TabItem Header="Applicaties">
+                <DataGrid ItemsSource="{Binding ApplicationsViewSource.View}" 
+                  SelectedItem="{Binding SelectedApplication}" 
+                  CanUserAddRows="False"
+                  AutoGenerateColumns="False" 
+                  KeyDown="DataGrid_KeyDown">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding Path=Checked, UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Binding="{Binding Name}" Width="*" IsReadOnly="True" Header="Naam"></DataGridTextColumn>
+                        <DataGridTextColumn Binding="{Binding InstallDate, StringFormat=d}" Width="auto" IsReadOnly="True" Header="Installatie"></DataGridTextColumn>
+                        <DataGridTextColumn Binding="{Binding Publisher.Name}" Width="auto" IsReadOnly="True" Header="Uitgever"></DataGridTextColumn>
+                        <DataGridTextColumn Binding="{Binding Version}" Width="auto" IsReadOnly="True" Header="Versie"></DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+
+            <TabItem Header="Log">
+                <ListBox ItemsSource="{Binding LogItems}"></ListBox>
+            </TabItem>
+            
+            <TabItem Header="Instellingen">
+                <StackPanel>
+                    <CheckBox IsChecked="{Binding SilentUninstall, Mode=TwoWay}" VerticalAlignment="Center" Content="Try silent uninstall for MsiExec commands"></CheckBox>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+        
+        <StackPanel Grid.Row="3" Orientation="Horizontal">
+            <Button Height="30" Width="100" HorizontalAlignment="Left" Command="{Binding RemoveCommand}">Verwijderen</Button>
+            <Button Height="30" Width="100" HorizontalAlignment="Left" Command="{Binding RefreshCommand}">Refresh</Button>
+            <Button Height="30" Width="100" HorizontalAlignment="Left" Click="SluitenButton_Clicked">Sluiten</Button>
+        </StackPanel>
+
+        
+        
+
+        
+    </Grid>
+</Window>
